@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
@@ -15,11 +16,14 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -54,6 +58,7 @@ public class Loader extends JavaPlugin implements Listener {
 	private static final String NEXUS_NAME = "§cNexusi Frakcj";
 	private static final String DELETE_NAME = "deleteMe";
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+	private static final boolean BLOCK_EXPLOSIONS = true;
 	
 	private ItemStack nexusItemStack() {
 		ItemStack itemStack = new ItemStack(Material.BEACON);
@@ -150,6 +155,32 @@ public class Loader extends JavaPlugin implements Listener {
 				event.setCancelled(true);
 			}
 		}
+	}
+	
+	@EventHandler
+	public void EntityExplodeEvent(EntityExplodeEvent event) {
+		if (!BLOCK_EXPLOSIONS) return;
+		List<Block> removedBlocks = new ArrayList<Block>();
+		event.blockList().forEach((b)->{
+			Location loc = b.getLocation().clone();
+			if (playersThatCanMakeFaction.containsValue(loc) || nexusMap.containsKey(loc)) {
+				removedBlocks.add(b);
+			}
+		});
+		event.blockList().removeAll(removedBlocks);
+	}
+	
+	@EventHandler
+	public void BlockExplodeEvent(BlockExplodeEvent event) {
+		if (!BLOCK_EXPLOSIONS) return;
+		List<Block> removedBlocks = new ArrayList<Block>();
+		event.blockList().forEach((b)->{
+			Location loc = b.getLocation().clone();
+			if (playersThatCanMakeFaction.containsValue(loc) || nexusMap.containsKey(loc)) {
+				removedBlocks.add(b);
+			}
+		});
+		event.blockList().removeAll(removedBlocks);
 	}
 	
 	@EventHandler
