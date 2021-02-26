@@ -51,7 +51,7 @@ public class Loader extends JavaPlugin implements Listener {
 	
 	private Map<OfflinePlayer, Location> playersThatCanMakeFaction = new HashMap<OfflinePlayer, Location>();
 	
-	private static final String NEXUS_NAME = "§cNexusi Frakcj";
+	private static final String NEXUS_NAME = "§cNexus";
 	private static final String DELETE_NAME = "deleteMe";
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	
@@ -99,7 +99,7 @@ public class Loader extends JavaPlugin implements Listener {
 	public void FactionCreateEvent(FactionCreateEvent event) {
 		if (!playersThatCanMakeFaction.containsKey(event.getFPlayer().getPlayer()) || event.getFactionTag().equals(DELETE_NAME)) {
 			event.setCancelled(true);
-			event.getFPlayer().getPlayer().sendMessage("§c[!]§r Musisz posiadać nexus frakcji aby to użyć!");// You need to have a nexus to do that!
+			event.getFPlayer().getPlayer().sendMessage("§c[!]§r You need to have a nexus to do that!");// You need to have a nexus to do that!
 		} else {
 			final Location nexus = playersThatCanMakeFaction.get(event.getFPlayer().getPlayer()).clone();
 			playersThatCanMakeFaction.remove(event.getFPlayer().getPlayer());
@@ -118,7 +118,7 @@ public class Loader extends JavaPlugin implements Listener {
 	public void FactionDisbandEvent(FactionDisbandEvent event) {
 		if (!(event.getFaction().getTag().equals(DELETE_NAME))) {
 			event.setCancelled(true);
-			event.getFPlayer().getPlayer().sendMessage("§c[!]§r Aby rozwiązać frakcję musisz zniszczyć swojego nexusa");// To disband your faction you must break your nexus
+			event.getFPlayer().getPlayer().sendMessage("§c[!]§r To disband your faction you must break your nexus");// To disband your faction you must break your nexus
 		}
 	}
 	
@@ -128,7 +128,7 @@ public class Loader extends JavaPlugin implements Listener {
 		if (itemStack.hasItemMeta() && itemStack.getItemMeta().getDisplayName().equals(NEXUS_NAME) && itemStack.getType().equals(Material.BEACON)) { // Is nexus
 			if (FPlayers.getInstance().getByPlayer(event.getPlayer()).hasFaction()) {
 				event.setCancelled(true);
-				event.getPlayer().sendMessage("§c[!]§r Nie możesz położyć nexusa ponieważ jesteś w frakcji!");// You cannot place a nexus while in a faction!
+				event.getPlayer().sendMessage("§c[!]§r You cannot place a nexus while in a faction!");// You cannot place a nexus while in a faction!
 			} else {
 				playersThatCanMakeFaction.put(event.getPlayer(), event.getBlock().getLocation());
 			}
@@ -141,7 +141,7 @@ public class Loader extends JavaPlugin implements Listener {
 			if (nexusMap.containsKey(event.getBlock().getLocation())) {
 				Faction faction = nexusMap.get(event.getBlock().getLocation());
 				nexusMap.remove(event.getBlock().getLocation());
-				Bukkit.getOnlinePlayers().forEach((p)->p.sendMessage("§lGILDIA §r"+faction.getTag()+" §lZOSTAŁA ROZJEBANA!"));
+				Bukkit.getOnlinePlayers().forEach((p)->p.sendMessage("§lThe faction §r"+faction.getTag()+" §lhas been defeated"));
 				faction.setTag(DELETE_NAME);
 				faction.disband(faction.getFPlayerLeader().getPlayer(), PlayerDisbandReason.PLUGIN);
 				faction.remove();
@@ -159,7 +159,7 @@ public class Loader extends JavaPlugin implements Listener {
 		}
 		if(event.getSlotType() == InventoryType.SlotType.RESULT && event.getCurrentItem().getType().equals(Material.BEACON) && event.getCurrentItem().getItemMeta().getItemFlags().contains(ItemFlag.HIDE_ATTRIBUTES)) {
 			event.setCancelled(true);
-			event.getWhoClicked().sendMessage("§c[!]§r Nie możesz zmienić nazwy nexusa"); // You cannot rename the nexus
+			event.getWhoClicked().sendMessage("§c[!]§r You cannot rename the nexus"); // You cannot rename the nexus
 		}
 	}
 	
@@ -167,7 +167,7 @@ public class Loader extends JavaPlugin implements Listener {
 	public void PlayerMoveEvent(PlayerMoveEvent event) {
 		if (playersThatCanMakeFaction.containsKey(event.getPlayer())) {
 			event.setCancelled(true);
-			event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§cstwórz swoją frakcję używając komendy /factions create <imie>")); // Create your faction by running /f create <name>
+			event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§cCreate your faction by running /factions create <name>")); // Create your faction by running /f create <name>
 		}
 	}
 	
