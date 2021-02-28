@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -123,6 +124,7 @@ public class Loader extends JavaPlugin implements Listener {
 					faction.setPowerBoost(faction.getPowerBoost()+1);
 					fPlayer.alterPower(1);
 					fPlayer.attemptClaim(faction, nexus, false);
+					nexus.getWorld().playSound(nexus, Sound.BLOCK_BEACON_ACTIVATE, 500, 1);
 				}
 				
 			}, 4l);
