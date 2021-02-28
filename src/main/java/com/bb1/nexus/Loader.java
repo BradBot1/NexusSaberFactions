@@ -12,6 +12,7 @@ import java.util.Scanner;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -39,12 +40,16 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.FPlayers;
 import com.massivecraft.factions.Faction;
 import com.massivecraft.factions.Factions;
 import com.massivecraft.factions.event.FactionCreateEvent;
 import com.massivecraft.factions.event.FactionDisbandEvent;
 import com.massivecraft.factions.event.FactionDisbandEvent.PlayerDisbandReason;
+import com.massivecraft.factions.event.FactionRenameEvent;
+import com.massivecraft.factions.event.LandUnclaimAllEvent;
+import com.massivecraft.factions.event.LandUnclaimEvent;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -112,10 +117,41 @@ public class Loader extends JavaPlugin implements Listener {
 
 				@Override
 				public void run() {
-					nexusMap.put(nexus, event.getFPlayer().getFaction());
+					FPlayer fPlayer = event.getFPlayer();
+					Faction faction = event.getFPlayer().getFaction();
+					nexusMap.put(nexus, faction);
+					faction.setPowerBoost(faction.getPowerBoost()+1);
+					fPlayer.alterPower(1);
+					fPlayer.attemptClaim(faction, nexus, false);
 				}
 				
-			}, 3l);
+			}, 4l);
+		}
+	}
+	
+	@EventHandler
+	public void LandUnclaimEvent(LandUnclaimEvent event) {
+		Chunk chunk = event.getLocation().getChunk();
+		nexusMap.forEach((k, v) -> {
+			if (event.isCancelled()) return;
+			Chunk chunk2 = k.getChunk();
+			if (!chunk2.isLoaded()) {
+				return;
+			} else if (k.getChunk().equals(chunk)) {
+				event.setCancelled(true);
+				event.getfPlayer().getPlayer().sendMessage("§c[!]§r You cannot unclaim a chunk that contains a nexus");// You cannot unclaim a chunk that contains a nexus
+			}
+		});
+	}
+	
+	@EventHandler
+	public void LandUnclaimAllEvent(LandUnclaimAllEvent event) {
+		event.setCancelled(true);// If they unclaimed all it would unclaim the nexus
+		for (Entry<Location, Faction> entry : nexusMap.entrySet()) {
+			if (entry.getValue().getId().equals(event.getFaction().getId())) {
+				event.getfPlayer().attemptClaim(entry.getValue(), entry.getKey(), false);
+				return;
+			}
 		}
 	}
 	
@@ -123,7 +159,19 @@ public class Loader extends JavaPlugin implements Listener {
 	public void FactionDisbandEvent(FactionDisbandEvent event) {
 		if (!(event.getFaction().getTag().equals(DELETE_NAME))) {
 			event.setCancelled(true);
-			event.getFPlayer().getPlayer().sendMessage("§c[!]§r Aby rozwiązać frakcję musisz zniszczyć swojego nexusa");// To disband your faction you must break your nexus
+			event.getFPlayer().getPlayer().sendMessage("§c[!]§r Nie możesz odebrać ziemi, która zawiera nexusa.");// To disband your faction you must break your nexus
+		}
+	}
+	
+	@EventHandler
+	public void FactionRenameEvent(FactionRenameEvent event) {
+		for (Entry<Location, Faction> entry : nexusMap.entrySet()) {
+			if (entry.getValue().getId().equals(event.getFaction().getId())) {
+				if (event.getFactionTag().equals(DELETE_NAME)) {
+					event.setCancelled(true);
+				}
+				return;
+			}
 		}
 	}
 	
