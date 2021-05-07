@@ -23,6 +23,10 @@
    <id>jitpack.io</id>
    <url>https://jitpack.io</url>
   </repository>
+  <repository>
+   <id>dynmap</id>
+   <url>http://repo.mikeprimm.com/</url>
+  </repository>
  </repositories>
  
  <dependencies>
@@ -36,5 +40,41 @@
     <artifactId>Saber-Factions</artifactId>
 	<version>2.6.2-STABLE</version>
    </dependency>
+   <dependency>
+    <groupId>org.dynmap</groupId>
+    <artifactId>dynmap</artifactId>
+    <version>2.0</version>
+    <scope>provided</scope>
+    <exclusions>
+     <exclusion>
+      <artifactId>bukkit</artifactId>
+      <groupId>org.bukkit</groupId>
+     </exclusion>
+     <exclusion>
+      <artifactId>Permissions</artifactId>
+      <groupId>com.nijikokun.bukkit</groupId>
+     </exclusion>
+     <exclusion>
+      <artifactId>bPermissions</artifactId>
+      <groupId>de.bananaco</groupId>
+     </exclusion>
+     <exclusion>
+      <artifactId>EssentialsGroupManager</artifactId>
+      <groupId>org.anjocaido</groupId>
+     </exclusion>
+     <exclusion>
+      <artifactId>spoutpluginapi</artifactId>
+       <groupId>org.getspout</groupId>
+      </exclusion>
+      <exclusion>
+       <artifactId>PermissionsBukkit</artifactId>
+       <groupId>com.platymuus.bukkit.permissions</groupId>
+      </exclusion>
+      <exclusion>
+       <artifactId>PermissionsEx</artifactId>
+       <groupId>ru.tehkode</groupId>
+      </exclusion>
+     </exclusions>
+    </dependency>
   </dependencies>
 </project>
